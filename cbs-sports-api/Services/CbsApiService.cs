@@ -1,4 +1,5 @@
 using cbs_sports_api.Models;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace cbs_sports_api.Services;
 
@@ -24,7 +25,14 @@ public class CbsApiService : ICbsApiService
 
     public async Task<IEnumerable<Player>> GetPlayersBySport(SportEnum sport)
     {
-        var response = await _client.GetAsync("players/list?version=3.0&SPORT=baseball&response_format=JSON");
+		Dictionary<string, string> queryString = new()
+		{
+			["version"] = "3.0",
+			// Cbs Api fails if this is PascalCase so it needs to be lower case
+			["sport"] = sport.ToString().ToLower(),
+			["response_format"] = "json",
+		};
+        var response = await _client.GetAsync(QueryHelpers.AddQueryString("players/list", queryString));
 		if (!response.IsSuccessStatusCode)
 		{
 			// todo handle error case
