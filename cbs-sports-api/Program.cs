@@ -1,6 +1,6 @@
 using cbs_sports_api.Data;
+using cbs_sports_api.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +14,8 @@ builder.Services.AddSwaggerGen();
 // Wire up database
 // Use in-memory for simplicity, but will be replaced with real database on non-local
 builder.Services.AddDbContext<PlayerDbContext>(options => options.UseInMemoryDatabase("InMemoryDb"));
+
+builder.Services.AddScoped<IImportPlayerService, ImportPlayerService>();
 
 var app = builder.Build();
 
