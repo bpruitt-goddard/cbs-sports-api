@@ -21,7 +21,7 @@ public class ImportPlayerService : IImportPlayerService
 
     public async Task ImportPlayers()
     {
-		var players = await _cbsApi.GetPlayersBySport("baseball");
+		var players = await _cbsApi.GetPlayersBySport(SportEnum.Baseball);
         _context.Players.AddRange(players.ToList());
         _context.SaveChanges();
     }
