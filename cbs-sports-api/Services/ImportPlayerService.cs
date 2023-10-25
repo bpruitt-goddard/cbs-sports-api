@@ -5,24 +5,24 @@ namespace cbs_sports_api.Services;
 
 public interface IImportPlayerService
 {
-	void ImportPlayers();
+	Task ImportPlayers();
 }
 
 public class ImportPlayerService : IImportPlayerService
 {
 	private readonly PlayerDbContext _context;
+	private readonly ICbsApiService _cbsApi;
 
-    public ImportPlayerService(PlayerDbContext context)
+    public ImportPlayerService(PlayerDbContext context, ICbsApiService cbsApi)
     {
         _context = context;
+        _cbsApi = cbsApi;
     }
 
-    public void ImportPlayers()
+    public async Task ImportPlayers()
     {
-        _context.Players.AddRange(
-            new Player(123, "First", "Last"),
-            new Player(456, "First 2", "Last 2")
-        );
+		var players = await _cbsApi.GetPlayersBySport("baseball");
+        _context.Players.AddRange(players.ToList());
         _context.SaveChanges();
     }
 }

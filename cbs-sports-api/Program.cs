@@ -15,6 +15,12 @@ builder.Services.AddSwaggerGen();
 // Use in-memory for simplicity, but will be replaced with real database on non-local
 builder.Services.AddDbContext<PlayerDbContext>(options => options.UseInMemoryDatabase("InMemoryDb"));
 
+builder.Services.AddHttpClient<ICbsApiService, CbsApiService>(client =>
+    {
+        // This can come from appsettings instead
+        client.BaseAddress = new Uri("http://api.cbssports.com/fantasy/"); 
+    });
+
 builder.Services.AddScoped<IImportPlayerService, ImportPlayerService>();
 
 var app = builder.Build();

@@ -29,9 +29,9 @@ public class PlayersController : ControllerBase
     }
 
 	[HttpPost("sync")]
-    public IActionResult SyncData()
+    public async Task<IActionResult> SyncData()
     {
-        _importPlayerService.ImportPlayers();
+        await _importPlayerService.ImportPlayers();
         return NoContent();
     }
 }
