@@ -31,11 +31,11 @@ public record PlayerGetDto
 	public string NameBrief {
 		get => Sport switch
 		{
-			SportEnum.Baseball => $"{InitialFromString(FirstName)}. {InitialFromString(LastName)}.",
-			SportEnum.Basketball => $"{FirstName} {InitialFromString(LastName)}.",
-			SportEnum.Football => $"{InitialFromString(FirstName)}. {LastName}",
+			SportEnum.Baseball => $"{FirstCharacter(FirstName)}. {FirstCharacter(LastName)}.",
+			SportEnum.Basketball => $"{FirstName} {FirstCharacter(LastName)}.",
+			SportEnum.Football => $"{FirstCharacter(FirstName)}. {LastName}",
 		};
 	}
 
-	private static string InitialFromString(string s) => s.Substring(0,1);
+	private static string FirstCharacter(string s) => s.Substring(0,1);
 }	

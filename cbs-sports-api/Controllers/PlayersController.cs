@@ -2,7 +2,6 @@ using cbs_sports_api.Data;
 using cbs_sports_api.Models;
 using cbs_sports_api.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
 namespace cbs_sports_api.Controllers;
 
@@ -10,13 +9,11 @@ namespace cbs_sports_api.Controllers;
 [Route("[controller]")]
 public class PlayersController : ControllerBase
 {
-    private readonly ILogger<PlayersController> _logger;
 	private readonly PlayerDbContext _context;
     private readonly IImportPlayerService _importPlayerService;
 
-    public PlayersController(ILogger<PlayersController> logger, PlayerDbContext context, IImportPlayerService importPlayerService)
+    public PlayersController(PlayerDbContext context, IImportPlayerService importPlayerService)
     {
-        _logger = logger;
         _context = context;
         _importPlayerService = importPlayerService;
     }
@@ -32,7 +29,6 @@ public class PlayersController : ControllerBase
         }
 
         double positionAgeDifference = GetPositionAgeDifference(found);
-
         return new PlayerGetDto(found, positionAgeDifference);
     }
 
@@ -55,7 +51,6 @@ public class PlayersController : ControllerBase
         }
 
         double positionAgeDifference = GetPositionAgeDifference(result);
-
         return new PlayerGetDto(result, positionAgeDifference);
 
         // This can be extracted to a search service
@@ -92,6 +87,8 @@ public class PlayersController : ControllerBase
         }
     }
 
+    // Calculate the difference in position between player's age and others in the position
+    // This can be extracted into a service class to improve testability
     private double GetPositionAgeDifference(Player player)
     {
         var averagePositionAge = _context.Players

@@ -9,8 +9,8 @@ public interface ICbsApiService
 }
 
 public record PlayerResponse(string UriAlias, string StatusMessage, int StatusCode, PlayerResponseBody Body);
-public record PlayerResponseBody(List<PlayerResponsePlayer> Players);
-public record PlayerResponsePlayer(int Id, string FirstName, string LastName, string Position, int? Age)
+public record PlayerResponseBody(List<ApiPlayer> Players);
+public record ApiPlayer(int Id, string FirstName, string LastName, string Position, int? Age)
 {
     public Player ToPlayerModel(SportEnum sport) => new(Id, FirstName, LastName, Position, Age, sport);
 }
@@ -35,7 +35,7 @@ public class CbsApiService : ICbsApiService
         var response = await _client.GetAsync(QueryHelpers.AddQueryString("players/list", queryString));
 		if (!response.IsSuccessStatusCode)
 		{
-			// todo handle error case
+			// TODO handle error case
 			return null;
 		}
 		
