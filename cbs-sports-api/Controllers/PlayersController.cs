@@ -34,14 +34,6 @@ public class PlayersController : ControllerBase
         double positionAgeDifference = GetPositionAgeDifference(found);
 
         return new PlayerGetDto(found, positionAgeDifference);
-
-        double GetPositionAgeDifference(Player player)
-        {
-            var averagePositionAge = _context.Players
-                .Where(p => p.Sport == player.Sport && p.Position == player.Position)
-                .Average(p => p.Age) ?? 0.00;
-            return Math.Abs((player.Age ?? 0.00) - averagePositionAge);
-        }
     }
 
     [HttpPost("sync")]
@@ -49,5 +41,62 @@ public class PlayersController : ControllerBase
     {
         await _importPlayerService.ImportPlayers();
         return NoContent();
+    }
+
+    [HttpPost("search")]
+    public ActionResult<PlayerGetDto> SearchPlayer(PlayerSearchDto search)
+    {
+        IQueryable<Player> query = BuildSearch(search);
+
+        var result = query.FirstOrDefault();
+        if (result is null)
+        {
+            return NotFound();
+        }
+
+        double positionAgeDifference = GetPositionAgeDifference(result);
+
+        return new PlayerGetDto(result, positionAgeDifference);
+
+        // This can be extracted to a search service
+        IQueryable<Player> BuildSearch(PlayerSearchDto search)
+        {
+            IQueryable<Player> query = _context.Players;
+
+            if (search.Sport is not null)
+            {
+                query = query.Where(p => p.Sport == search.Sport);
+            }
+
+            if (search.FirstLetterLastName is not null)
+            {
+                query = query.Where(p => p.LastName.StartsWith(search.FirstLetterLastName.Value));
+            }
+
+            if (search.MinAge is not null)
+            {
+                query = query.Where(p => p.Age >= search.MinAge);
+            }
+
+            if (search.MaxAge is not null)
+            {
+                query = query.Where(p => p.Age <= search.MaxAge);
+            }
+
+            if (search.Position is not null)
+            {
+                query = query.Where(p => p.Position == search.Position);
+            }
+
+            return query;
+        }
+    }
+
+    private double GetPositionAgeDifference(Player player)
+    {
+        var averagePositionAge = _context.Players
+            .Where(p => p.Sport == player.Sport && p.Position == player.Position)
+            .Average(p => p.Age) ?? 0.00;
+        return Math.Abs((player.Age ?? 0.00) - averagePositionAge);
     }
 }
