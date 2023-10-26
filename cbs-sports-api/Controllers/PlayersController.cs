@@ -20,10 +20,10 @@ public class PlayersController : ControllerBase
         _importPlayerService = importPlayerService;
     }
 
-    [HttpGet("{id}")]
-    public ActionResult<Player> Get(int id)
+    [HttpGet("{sport}/{id}")]
+    public ActionResult<Player> Get(SportEnum sport, int id)
     {
-        var found = _context.Players.FirstOrDefault(p => p.Id == id);
+        var found = _context.Players.FirstOrDefault(p => p.Sport == sport && p.Id == id);
 
         return found is null ? NotFound() : found;
     }
