@@ -2,6 +2,7 @@ using cbs_sports_api.Data;
 using cbs_sports_api.Models;
 using cbs_sports_api.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
 namespace cbs_sports_api.Controllers;
 
@@ -21,14 +22,29 @@ public class PlayersController : ControllerBase
     }
 
     [HttpGet("{sport}/{id}")]
-    public ActionResult<Player> Get(SportEnum sport, int id)
+    public ActionResult<PlayerGetDto> Get(SportEnum sport, int id)
     {
         var found = _context.Players.FirstOrDefault(p => p.Sport == sport && p.Id == id);
 
-        return found is null ? NotFound() : found;
+        if (found is null)
+        {
+            return NotFound();
+        }
+
+        double positionAgeDifference = GetPositionAgeDifference(found);
+
+        return new PlayerGetDto(found, positionAgeDifference);
+
+        double GetPositionAgeDifference(Player player)
+        {
+            var averagePositionAge = _context.Players
+                .Where(p => p.Sport == player.Sport && p.Position == player.Position)
+                .Average(p => p.Age) ?? 0.00;
+            return Math.Abs((player.Age ?? 0.00) - averagePositionAge);
+        }
     }
 
-	[HttpPost("sync")]
+    [HttpPost("sync")]
     public async Task<IActionResult> SyncData()
     {
         await _importPlayerService.ImportPlayers();
