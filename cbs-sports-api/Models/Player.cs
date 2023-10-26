@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace cbs_sports_api.Models;
 
-public record Player(int Id, string FirstName, string LastName, string Position, int? Age, SportEnum sport);
+[PrimaryKey(nameof(Id), nameof(Sport))]
+public record Player(int Id, string FirstName, string LastName, string Position, int? Age, SportEnum Sport);
